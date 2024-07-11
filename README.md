@@ -379,4 +379,7 @@ BEGIN
     EXEC sp_executesql @sql;
 END
 
-
+=========================================================================================================
+Review below for the link to study at work
+=======================================================================================================
+1. Unlocking the Power of Airflow Metadata Database: Exploring Tables for Workflow Management(https://www.youtube.com/watch?v=Dry_huCd4-Q)
