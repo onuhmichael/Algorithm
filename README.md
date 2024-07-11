@@ -383,3 +383,5 @@ END
 Review below for the link to study at work
 =======================================================================================================
 1. Unlocking the Power of Airflow Metadata Database: Exploring Tables for Workflow Management(https://www.youtube.com/watch?v=Dry_huCd4-Q)
+2. write a LinkedIn post Week 1: Introduction to Health Data Architecture
+Explain the importance of data architecture in the health sector, emphasizing its role in improving patient care and operational efficiency.
