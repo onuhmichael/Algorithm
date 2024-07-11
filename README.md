@@ -37,7 +37,7 @@
 - **Data Validation:** Include steps to validate the data before and after updates to ensure data integrity and consistency
 
 
-# Flow chart Mermaid code:
+### Flow chart Mermaid code:
 graph TD
     A[Start] --> B[Create Users Table with ID]
     B --> C[Identify Relevant Tables and Columns]
@@ -54,7 +54,7 @@ graph TD
     M --> N[End]
 
 
- # Instructions to Use:
+### Instructions to Use:
 Open draw.io: Go to draw.io and start a new diagram.
 Create New Diagram: Choose a blank diagram or any template that suits your needs.
 Insert Mermaid Code:
