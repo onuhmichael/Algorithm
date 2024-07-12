@@ -1,3 +1,79 @@
+It is possible to create a dynamic SQL query that iterates through all the tables in your database to extract the `Surname` or `FamilyName` and `Firstname` columns, regardless of their naming inconsistencies. This can be achieved by querying the system catalog views to identify the relevant columns and then constructing and executing a dynamic SQL statement.
+
+Here's how you can do it:
+
+1. **Identify the relevant columns across all tables using system catalog views.**
+2. **Construct a dynamic SQL query that iterates through these tables and columns.**
+3. **Execute the dynamic SQL to get the desired result.**
+
+Here's the T-SQL code to accomplish this:
+
+```sql
+DECLARE @sql NVARCHAR(MAX) = N'';
+DECLARE @table NVARCHAR(128);
+DECLARE @schema NVARCHAR(128);
+DECLARE @column1 NVARCHAR(128);
+DECLARE @column2 NVARCHAR(128);
+
+-- Cursor to iterate through all relevant tables and columns
+DECLARE column_cursor CURSOR FOR
+SELECT 
+    t.TABLE_SCHEMA,
+    t.TABLE_NAME,
+    c1.COLUMN_NAME AS SurnameColumn,
+    c2.COLUMN_NAME AS FirstnameColumn
+FROM 
+    INFORMATION_SCHEMA.TABLES t
+JOIN 
+    INFORMATION_SCHEMA.COLUMNS c1 ON t.TABLE_SCHEMA = c1.TABLE_SCHEMA AND t.TABLE_NAME = c1.TABLE_NAME
+JOIN 
+    INFORMATION_SCHEMA.COLUMNS c2 ON t.TABLE_SCHEMA = c2.TABLE_SCHEMA AND t.TABLE_NAME = c2.TABLE_NAME
+WHERE 
+    t.TABLE_TYPE = 'BASE TABLE'
+    AND (c1.COLUMN_NAME = 'Surname' OR c1.COLUMN_NAME = 'FamilyName')
+    AND c2.COLUMN_NAME = 'Firstname';
+
+-- Open the cursor
+OPEN column_cursor;
+FETCH NEXT FROM column_cursor INTO @schema, @table, @column1, @column2;
+
+-- Loop through the cursor
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    SET @sql = @sql + 
+        'SELECT ''' + @schema + '.' + @table + ''' AS TableName, ' +
+        'COALESCE(' + QUOTENAME(@column1) + ', ' + QUOTENAME(@column1) + ') AS LastName, ' +
+        QUOTENAME(@column2) + ' AS Firstname ' +
+        'FROM ' + QUOTENAME(@schema) + '.' + QUOTENAME(@table) + ' ' +
+        'WHERE ' + QUOTENAME(@column1) + ' IS NOT NULL ' +
+        'UNION ALL ';
+        
+    FETCH NEXT FROM column_cursor INTO @schema, @table, @column1, @column2;
+END;
+
+-- Close and deallocate the cursor
+CLOSE column_cursor;
+DEALLOCATE column_cursor;
+
+-- Remove the last 'UNION ALL'
+IF LEN(@sql) > 0
+BEGIN
+    SET @sql = LEFT(@sql, LEN(@sql) - LEN(' UNION ALL '));
+END
+
+-- Execute the dynamic SQL
+EXEC sp_executesql @sql;
+```
+
+### Explanation:
+1. **Cursor Initialization**: A cursor is initialized to iterate through all relevant tables and columns.
+2. **Joining System Catalog Views**: `INFORMATION_SCHEMA.TABLES` and `INFORMATION_SCHEMA.COLUMNS` views are used to identify tables that contain either `Surname` or `FamilyName` and `Firstname` columns.
+3. **Dynamic SQL Construction**: For each table identified, a `SELECT` statement is constructed dynamically, appending it to the `@sql` variable.
+4. **Removing Last `UNION ALL`**: The trailing `UNION ALL` is removed to ensure the final query is valid.
+5. **Executing the Query**: The constructed dynamic SQL is executed using `sp_executesql`.
+
+This method dynamically builds and executes the SQL query to handle a large number of tables without manually specifying each table, making it efficient and scalable for databases with many tables.
+==========================================================================================
 ### Optimized Algorithm with Unique Identifier:
 
 1. **Create a Permanent Table to Store Extracted User Data:**
