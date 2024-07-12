@@ -72,8 +72,99 @@ EXEC sp_executesql @sql;
 4. **Removing Last `UNION ALL`**: The trailing `UNION ALL` is removed to ensure the final query is valid.
 5. **Executing the Query**: The constructed dynamic SQL is executed using `sp_executesql`.
 
-This method dynamically builds and executes the SQL query to handle a large number of tables without manually specifying each table, making it efficient and scalable for databases with many tables.
-==========================================================================================
+### This method dynamically builds and executes the SQL query to handle a large number of tables without manually specifying each table, making it efficient and scalable for databases with many tables.
+=====================================================================================================================
+To modify the given query so that it inserts the output into a table called `mion.UnusedUsers` in a database called `InfoT`, you can wrap the dynamically constructed query in an `INSERT INTO` statement. Here’s how you can do it:
+
+1. **Create the target table if it doesn't exist**.
+2. **Modify the dynamic SQL to insert the results into the target table**.
+
+Here is the updated script:
+
+```sql
+USE InfoTeamArea;
+
+-- Step 1: Create the target table if it doesn't exist
+IF OBJECT_ID('mion.UnusedUsers', 'U') IS NULL
+BEGIN
+    CREATE TABLE mion.UnusedUsers (
+        TableName NVARCHAR(256),
+        LastName NVARCHAR(256),
+        Firstname NVARCHAR(256)
+    );
+END;
+
+-- Step 2: Declare variables for dynamic SQL construction
+DECLARE @sql NVARCHAR(MAX) = N'';
+DECLARE @table NVARCHAR(128);
+DECLARE @schema NVARCHAR(128);
+DECLARE @column1 NVARCHAR(128);
+DECLARE @column2 NVARCHAR(128);
+
+-- Step 3: Cursor to iterate through all relevant tables and columns
+DECLARE column_cursor CURSOR FOR
+SELECT 
+    t.TABLE_SCHEMA,
+    t.TABLE_NAME,
+    c1.COLUMN_NAME AS SurnameColumn,
+    c2.COLUMN_NAME AS FirstnameColumn
+FROM 
+    INFORMATION_SCHEMA.TABLES t
+JOIN 
+    INFORMATION_SCHEMA.COLUMNS c1 ON t.TABLE_SCHEMA = c1.TABLE_SCHEMA AND t.TABLE_NAME = c1.TABLE_NAME
+JOIN 
+    INFORMATION_SCHEMA.COLUMNS c2 ON t.TABLE_SCHEMA = c2.TABLE_SCHEMA AND t.TABLE_NAME = c2.TABLE_NAME
+WHERE 
+    t.TABLE_TYPE = 'BASE TABLE'
+    AND (c1.COLUMN_NAME = 'Surname' OR c1.COLUMN_NAME = 'FamilyName')
+    AND c2.COLUMN_NAME = 'Firstname';
+
+-- Step 4: Open the cursor
+OPEN column_cursor;
+FETCH NEXT FROM column_cursor INTO @schema, @table, @column1, @column2;
+
+-- Step 5: Loop through the cursor to build the dynamic SQL
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    SET @sql = @sql + 
+        'SELECT ''' + @schema + '.' + @table + ''' AS TableName, ' +
+        'COALESCE(' + QUOTENAME(@column1) + ', ' + QUOTENAME(@column1) + ') AS LastName, ' +
+        QUOTENAME(@column2) + ' AS Firstname ' +
+        'FROM ' + QUOTENAME(@schema) + '.' + QUOTENAME(@table) + ' ' +
+        'WHERE ' + QUOTENAME(@column1) + ' IS NOT NULL ' +
+        'UNION ALL ';
+        
+    FETCH NEXT FROM column_cursor INTO @schema, @table, @column1, @column2;
+END;
+
+-- Step 6: Close and deallocate the cursor
+CLOSE column_cursor;
+DEALLOCATE column_cursor;
+
+-- Step 7: Remove the last 'UNION ALL'
+IF LEN(@sql) > 0
+BEGIN
+    SET @sql = LEFT(@sql, LEN(@sql) - LEN(' UNION ALL '));
+END
+
+-- Step 8: Insert the results into the target table
+SET @sql = 'INSERT INTO mion.UnusedUsers (TableName, LastName, Firstname) ' + @sql;
+
+-- Step 9: Execute the dynamic SQL
+EXEC sp_executesql @sql;
+```
+
+### Explanation:
+
+1. **Creating the Target Table**: The script first checks if the `mion.UnusedUsers` table exists in the `InfoTeamArea` database. If it doesn’t, it creates the table.
+2. **Dynamic SQL Construction**: The cursor iterates through all relevant tables and columns, constructing a `SELECT` statement for each table that matches the criteria.
+3. **Combining Queries with `UNION ALL`**: The individual `SELECT` statements are combined using `UNION ALL`.
+4. **Removing the Last `UNION ALL`**: The trailing `UNION ALL` is removed to ensure the final query is valid.
+5. **Inserting Results into Target Table**: The dynamically constructed query is prefixed with an `INSERT INTO` statement to insert the results into `mion.UnusedUsers`.
+6. **Executing the Query**: The final dynamic SQL query is executed.
+
+###This approach ensures that the results from all relevant tables are inserted into the specified table in a single operation.
+=======================================================================================================================
 ### Optimized Algorithm with Unique Identifier:
 
 1. **Create a Permanent Table to Store Extracted User Data:**
