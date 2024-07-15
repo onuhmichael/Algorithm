@@ -1,3 +1,57 @@
+
+### 15th July 2024 C (Spercailty )
+
+DECLARE @sql NVARCHAR(MAX) = N'';
+DECLARE @table NVARCHAR(128);
+DECLARE @schema NVARCHAR(128);
+DECLARE @specialtyColumn NVARCHAR(128);
+
+-- Cursor to iterate through all relevant tables and columns
+DECLARE column_cursor CURSOR FOR
+SELECT 
+    t.TABLE_SCHEMA,
+    t.TABLE_NAME,
+    c.COLUMN_NAME AS SpecialtyColumn
+FROM 
+    INFORMATION_SCHEMA.TABLES t
+JOIN 
+    INFORMATION_SCHEMA.COLUMNS c ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME
+WHERE 
+    t.TABLE_TYPE = 'BASE TABLE'
+    AND c.COLUMN_NAME = 'Specialty';
+
+-- Open the cursor
+OPEN column_cursor;
+FETCH NEXT FROM column_cursor INTO @schema, @table, @specialtyColumn;
+
+-- Loop through the cursor
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    SET @sql = @sql + 
+        'SELECT ''' + @schema + '.' + @table + ''' AS TableName, ' +
+        QUOTENAME(@specialtyColumn) + ' AS Specialty ' +
+        'FROM ' + QUOTENAME(@schema) + '.' + QUOTENAME(@table) + ' ' +
+        'UNION ALL ';
+        
+    FETCH NEXT FROM column_cursor INTO @schema, @table, @specialtyColumn;
+END;
+
+-- Close and deallocate the cursor
+CLOSE column_cursor;
+DEALLOCATE column_cursor;
+
+-- Remove the last 'UNION ALL'
+IF LEN(@sql) > 0
+BEGIN
+    SET @sql = LEFT(@sql, LEN(@sql) - LEN(' UNION ALL '));
+END
+
+-- Print the final dynamic SQL for debugging
+PRINT @sql;
+
+-- Execute the dynamic SQL
+EXEC sp_executesql @sql;
+
 ===================================================================================================================================================================
 ### 15th July 2024 B
 =========================================================================================================================================================================
