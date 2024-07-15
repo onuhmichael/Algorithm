@@ -1,5 +1,72 @@
-15th July 2024
-============================================
+===================================================================================================================================================================
+### 15th July 2024 B
+=========================================================================================================================================================================
+DECLARE @sql NVARCHAR(MAX) = N'';
+DECLARE @table NVARCHAR(128);
+DECLARE @schema NVARCHAR(128);
+DECLARE @column1 NVARCHAR(128);
+DECLARE @column2 NVARCHAR(128);
+DECLARE @specialtyColumn NVARCHAR(128);
+
+-- Cursor to iterate through all relevant tables and columns
+DECLARE column_cursor CURSOR FOR
+SELECT 
+    t.TABLE_SCHEMA,
+    t.TABLE_NAME,
+    c1.COLUMN_NAME AS SurnameColumn,
+    c2.COLUMN_NAME AS FirstnameColumn,
+    s.COLUMN_NAME AS SpecialtyColumn
+FROM 
+    INFORMATION_SCHEMA.TABLES t
+JOIN 
+    INFORMATION_SCHEMA.COLUMNS c1 ON t.TABLE_SCHEMA = c1.TABLE_SCHEMA AND t.TABLE_NAME = c1.TABLE_NAME
+JOIN 
+    INFORMATION_SCHEMA.COLUMNS c2 ON t.TABLE_SCHEMA = c2.TABLE_SCHEMA AND t.TABLE_NAME = c2.TABLE_NAME
+JOIN 
+    INFORMATION_SCHEMA.COLUMNS s ON t.TABLE_SCHEMA = s.TABLE_SCHEMA AND t.TABLE_NAME = s.TABLE_NAME AND s.COLUMN_NAME = 'Specialty'
+WHERE 
+    t.TABLE_TYPE = 'BASE TABLE'
+    AND (c1.COLUMN_NAME = 'Surname' OR c1.COLUMN_NAME = 'FamilyName')
+    AND c2.COLUMN_NAME = 'Firstname';
+
+-- Open the cursor
+OPEN column_cursor;
+FETCH NEXT FROM column_cursor INTO @schema, @table, @column1, @column2, @specialtyColumn;
+
+-- Loop through the cursor
+WHILE @@FETCH_STATUS = 0
+BEGIN
+    SET @sql = @sql + 
+        'SELECT ''' + @schema + '.' + @table + ''' AS TableName, ' +
+        'COALESCE(' + QUOTENAME(@column1) + ', ' + QUOTENAME(@column1) + ') AS LastName, ' +
+        QUOTENAME(@column2) + ' AS Firstname, ' +
+        'COALESCE(' + QUOTENAME(@specialtyColumn) + ', ''No Specialty'') AS User_Specialty ' +
+        'FROM ' + QUOTENAME(@schema) + '.' + QUOTENAME(@table) + ' ' +
+        'WHERE ' + QUOTENAME(@column1) + ' IS NOT NULL ' +
+        'UNION ALL ';
+        
+    FETCH NEXT FROM column_cursor INTO @schema, @table, @column1, @column2, @specialtyColumn;
+END;
+
+-- Close and deallocate the cursor
+CLOSE column_cursor;
+DEALLOCATE column_cursor;
+
+-- Remove the last 'UNION ALL'
+IF LEN(@sql) > 0
+BEGIN
+    SET @sql = LEFT(@sql, LEN(@sql) - LEN(' UNION ALL '));
+END
+
+-- Print the final dynamic SQL for debugging
+PRINT @sql;
+
+-- Execute the dynamic SQL
+EXEC sp_executesql @sql;
+
+==============================================================================================================================================
+### 15th July 2024 A
+===============================================================================================================================================
 DECLARE @sql NVARCHAR(MAX) = N'';
 DECLARE @table NVARCHAR(128);
 DECLARE @schema NVARCHAR(128);
