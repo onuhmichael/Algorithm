@@ -1,4 +1,131 @@
 
+### 16th July 2024 A (How to build an MPI(Master Patient Index ) from Selecting Tables with common columns )
+To build a Master Patient Index (MPI) table based on the common columns you provided, we need to create a new table that consolidates these columns. The MPI table will include identifiers like `AppointmentID`, `DoctorID`, `PatientID`, `FirstName`, and `LastName`. This table will serve as a central repository to manage and link patient records across the various tables.
+
+Here's how you can create an MPI table and populate it based on the common columns:
+
+### Step 1: Create the Master Patient Index Table
+
+First, create the MPI table with the necessary columns:
+
+```sql
+CREATE TABLE MasterPatientIndex (
+    AppointmentID INT NULL,
+    PrescriptionID INT NULL,
+    DoctorID INT NULL,
+    PatientID INT NULL,
+    FirstName NVARCHAR(100) NULL,
+    LastName NVARCHAR(100) NULL
+);
+```
+
+### Step 2: Populate the Master Patient Index Table
+
+Next, insert data into the MPI table by joining the relevant tables based on the common columns. We'll ensure that the table is populated with unique records to avoid duplicates.
+
+```sql
+-- Insert data from Appointments and Patients
+INSERT INTO MasterPatientIndex (AppointmentID, PatientID, FirstName, LastName)
+SELECT DISTINCT
+    a.AppointmentID,
+    p.PatientID,
+    p.FirstName,
+    p.LastName
+FROM Appointments a
+JOIN Patients p ON a.PatientID = p.PatientID;
+
+-- Insert data from Doctors
+INSERT INTO MasterPatientIndex (DoctorID, FirstName, LastName)
+SELECT DISTINCT
+    d.DoctorID,
+    d.FirstName,
+    d.LastName
+FROM Doctors d
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM MasterPatientIndex mpi
+    WHERE mpi.DoctorID = d.DoctorID
+        AND mpi.FirstName = d.FirstName
+        AND mpi.LastName = d.LastName
+);
+
+-- Insert data from Prescriptions
+INSERT INTO MasterPatientIndex (PrescriptionID, AppointmentID)
+SELECT DISTINCT
+    pr.PrescriptionID,
+    pr.AppointmentID
+FROM Prescriptions pr
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM MasterPatientIndex mpi
+    WHERE mpi.PrescriptionID = pr.PrescriptionID
+        AND mpi.AppointmentID = pr.AppointmentID
+);
+```
+
+### Step 3: Ensure Data Consistency
+
+Ensure that each record in the MPI table is unique and consistent. You might want to add constraints or indexes to enforce uniqueness and improve query performance.
+
+```sql
+-- Add a primary key or unique constraint if necessary
+-- ALTER TABLE MasterPatientIndex ADD CONSTRAINT PK_MasterPatientIndex PRIMARY KEY (PatientID);
+-- or for a composite key
+-- ALTER TABLE MasterPatientIndex ADD CONSTRAINT PK_MasterPatientIndex PRIMARY KEY (AppointmentID, DoctorID, PatientID);
+
+-- Create indexes to improve query performance
+CREATE INDEX IX_MasterPatientIndex_DoctorID ON MasterPatientIndex (DoctorID);
+CREATE INDEX IX_MasterPatientIndex_PatientID ON MasterPatientIndex (PatientID);
+CREATE INDEX IX_MasterPatientIndex_AppointmentID ON MasterPatientIndex (AppointmentID);
+CREATE INDEX IX_MasterPatientIndex_PrescriptionID ON MasterPatientIndex (PrescriptionID);
+```
+
+### Explanation:
+
+1. **Master Patient Index Table Creation**:
+   - We create the `MasterPatientIndex` table with columns to accommodate the common columns from the provided tables.
+
+2. **Populating the MPI Table**:
+   - We insert data from the `Appointments` and `Patients` tables based on the common `PatientID` and personal details.
+   - We insert data from the `Doctors` table, ensuring no duplicates by checking for existing records.
+   - We insert data from the `Prescriptions` table, similarly ensuring no duplicates.
+
+3. **Ensuring Uniqueness and Performance**:
+   - Optional: Adding primary keys or unique constraints to enforce data integrity.
+   - Indexes are added to improve query performance when accessing the MPI table.
+
+This setup should provide a consolidated Master Patient Index table that links records across the `Appointments`, `Doctors`, `Patients`, and `Prescriptions` tables based on the common columns.
+
+### 16th July 2024 A (Selecting Tables with common columns )
+
+-- Create a temporary table to store columns for each table
+CREATE TABLE #TableColumns (
+    TableName NVARCHAR(128),
+    ColumnName NVARCHAR(128)
+);
+
+-- Insert columns from each specified table into the temporary table
+INSERT INTO #TableColumns (TableName, ColumnName)
+SELECT TABLE_NAME, COLUMN_NAME
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME IN ('Appointments', 'Doctors', 'Patients', 'Prescriptions');
+
+-- Find columns that are common to any of the specified tables
+-- and include the table names where they appear
+WITH CommonColumns AS (
+    SELECT ColumnName, COUNT(DISTINCT TableName) AS TableCount
+    FROM #TableColumns
+    GROUP BY ColumnName
+    HAVING COUNT(DISTINCT TableName) > 1
+)
+SELECT cc.ColumnName, tc.TableName
+FROM CommonColumns cc
+JOIN #TableColumns tc ON cc.ColumnName = tc.ColumnName
+ORDER BY cc.ColumnName, tc.TableName;
+
+-- Drop the temporary table
+DROP TABLE #TableColumns;
+
 ### 15th July 2024 C (Spercailty )
 
 DECLARE @sql NVARCHAR(MAX) = N'';
