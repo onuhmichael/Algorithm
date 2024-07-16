@@ -98,6 +98,9 @@ This setup should provide a consolidated Master Patient Index table that links r
 
 ### 16th July 2024 A (Selecting Tables with common columns )
 
+ **To include the table names that have these common columns as part of the output, we can extend the query to capture and display the relevant information. Here’s an updated version of the query that lists the common columns along**  **with the tables in which they appear**:
+
+```sql
 -- Create a temporary table to store columns for each table
 CREATE TABLE #TableColumns (
     TableName NVARCHAR(128),
@@ -125,60 +128,23 @@ ORDER BY cc.ColumnName, tc.TableName;
 
 -- Drop the temporary table
 DROP TABLE #TableColumns;
+```
 
-### 15th July 2024 C (Spercailty )
+### Explanation:
 
-DECLARE @sql NVARCHAR(MAX) = N'';
-DECLARE @table NVARCHAR(128);
-DECLARE @schema NVARCHAR(128);
-DECLARE @specialtyColumn NVARCHAR(128);
+1. **Temporary Table**: `#TableColumns` is created to store the table names and their respective column names.
 
--- Cursor to iterate through all relevant tables and columns
-DECLARE column_cursor CURSOR FOR
-SELECT 
-    t.TABLE_SCHEMA,
-    t.TABLE_NAME,
-    c.COLUMN_NAME AS SpecialtyColumn
-FROM 
-    INFORMATION_SCHEMA.TABLES t
-JOIN 
-    INFORMATION_SCHEMA.COLUMNS c ON t.TABLE_SCHEMA = c.TABLE_SCHEMA AND t.TABLE_NAME = c.TABLE_NAME
-WHERE 
-    t.TABLE_TYPE = 'BASE TABLE'
-    AND c.COLUMN_NAME = 'Specialty';
+2. **Insert Columns**: The query inserts the table names and column names for the specified tables (`Appointments`, `Doctors`, `Patients`, `Prescriptions`) into the temporary table.
 
--- Open the cursor
-OPEN column_cursor;
-FETCH NEXT FROM column_cursor INTO @schema, @table, @specialtyColumn;
+3. **Common Columns**: The `CommonColumns` CTE (Common Table Expression) identifies columns that appear in more than one table (`HAVING COUNT(DISTINCT TableName) > 1`).
 
--- Loop through the cursor
-WHILE @@FETCH_STATUS = 0
-BEGIN
-    SET @sql = @sql + 
-        'SELECT ''' + @schema + '.' + @table + ''' AS TableName, ' +
-        QUOTENAME(@specialtyColumn) + ' AS Specialty ' +
-        'FROM ' + QUOTENAME(@schema) + '.' + QUOTENAME(@table) + ' ' +
-        'UNION ALL ';
-        
-    FETCH NEXT FROM column_cursor INTO @schema, @table, @specialtyColumn;
-END;
+4. **Join for Output**: The main query joins the `CommonColumns` CTE with the `#TableColumns` temporary table to get the table names for each common column.
 
--- Close and deallocate the cursor
-CLOSE column_cursor;
-DEALLOCATE column_cursor;
+5. **Order by**: The result is ordered by `ColumnName` and `TableName` for better readability.
 
--- Remove the last 'UNION ALL'
-IF LEN(@sql) > 0
-BEGIN
-    SET @sql = LEFT(@sql, LEN(@sql) - LEN(' UNION ALL '));
-END
+6. **Cleanup**: The temporary table `#TableColumns` is dropped to clean up resources.
 
--- Print the final dynamic SQL for debugging
-PRINT @sql;
-
--- Execute the dynamic SQL
-EXEC sp_executesql @sql;
-
+This script will list the common columns along with the names of the tables in which they appear.
 ===================================================================================================================================================================
 ### 15th July 2024 B
 =========================================================================================================================================================================
