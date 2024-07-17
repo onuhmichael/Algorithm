@@ -1,66 +1,90 @@
+### Goals and Objectives
 
-### Goals and Objectives with Timeline for Designing Scalable Health Data Systems
+**1. Deepen Understanding of On-Premises Architecture**
+- **Objective**: Gain a comprehensive understanding of the current on-premises architecture, including MSSQL server, SSIS, stored procedures, SQL agent jobs, and linked servers.
 
-#### Goal 1: Deepen Understanding of On-Premises Architecture
-**Objective:** Gain a comprehensive understanding of the current on-premises architecture, including MSSQL server, SSIS, stored procedures, SQL agent jobs, and linked servers.
+**2. Master Current Business Requirements**
+- **Objective**: Understand the specific data needs and workflows of the NHS to ensure a smooth transition to the cloud that meets all necessary requirements.
 
-- **Timeline:**
-  - **Month 1-2:** 
-    - **T-SQL Basics:** Master fundamental T-SQL concepts (querying, filtering, sorting, joining tables).
-    - **Stored Procedures:** Learn to create, modify, and execute stored procedures.
-  - **Month 3:**
-    - **SQL Agent Jobs:** Explore scheduling tasks, backups, and maintenance with SQL Agent jobs.
-    - **Linked Servers:** Set up and use linked servers to connect to external data sources.
-  - **Ongoing:** 
-    - **Practice:** Apply T-SQL knowledge and MSSQL server management in projects.
+**3. Understanding and Applying Metadata in NHS Data Cataloging**
+- **Objective**: Learn about the structure, meaning, and context of metadata. In the NHS context, ensure data quality, compliance, and efficient data management through metadata.
 
-#### Goal 2: Master Current Business Requirements
-**Objective:** Understand the specific data needs and workflows of the NHS to ensure a smooth transition to the cloud.
+**4. Prepare for Cloud Transition**
+- **Objective**: Equip yourself with the skills and knowledge needed for a seamless transition from on-premises to cloud-based solutions.
 
-- **Timeline:**
-  - **Month 1-3:** 
-    - **Collaborate:** Work closely with other teams to understand their data needs.
-    - **Analyze:** Review current data workflows and identify areas for improvement.
+**5. Foster a Compassionate and Inclusive Work Culture**
+- **Objective**: Promote a work culture that aligns with trust values and behaviors, fostering kindness, respect, and teamwork.
 
-#### Goal 3: Understand and Apply Metadata in NHS Data Cataloging
-**Objective:** Use metadata to ensure data quality, compliance, and efficient data management in the NHS context.
+---
 
-- **Timeline:**
-  - **Month 1-2:** 
-    - **Basics of Metadata:** Get acquainted with the basics of metadata (origin, structure, context).
-    - **EHDS:** Delve into the European Health Data Space (EHDS) documentation.
-  - **Month 3-4:** 
-    - **Health Data Standards:** Explore FHIR and HL7 standards and link them to metadata concepts.
-    - **Use Cases:** Examine real-world instances where metadata is vital.
-  - **Month 5:** 
-    - **Hands-On Practice:** Establish a local environment or utilize cloud services to manage metadata for health-related datasets.
-    - **Stay Updated:** Follow relevant blogs, forums, and conferences.
-  - **Month 6:** 
-    - **Metadata Tools:** Investigate open-source data catalog tools and understand Microsoft Purview's capabilities.
-    - **Action Steps:** Set up Purview, catalog data sources, and explore data lineage.
+### Actions
 
-#### Goal 4: Prepare for Cloud Transition
-**Objective:** Equip yourself with the necessary skills and knowledge for transitioning from on-premises to cloud-based solutions.
+**1. On-Premises Architecture Mastery**
 
-- **Timeline:**
-  - **Month 1-4:** 
-    - **Learn:** Enroll in courses or training programs focused on cloud-based data solutions.
-  - **Month 5-6:** 
-    - **Certification:** Obtain relevant certifications (e.g., AWS AI Fundamentals, AWS Machine Learning, Azure Solution Architect).
-    - **Stay Updated:** Keep abreast of the latest trends and best practices in cloud data management.
+- **Improving Proficiency in T-SQL**
+  - **Basics**: Start with fundamental T-SQL concepts, including querying data, filtering, sorting, and joining tables.
+  - **Stored Procedures**: Learn to create, modify, and execute stored procedures to encapsulate business logic.
+  - **SQL Agent Jobs**: Explore SQL Agent jobs for scheduling tasks, backups, and maintenance.
+  - **Linked Servers**: Understand how to set up and use linked servers to connect to external data sources.
+  - **Practice**: Apply T-SQL knowledge in projects and manage MSSQL servers effectively.
 
-#### Goal 5: Foster a Compassionate and Inclusive Work Culture
-**Objective:** Align personal behaviors with Trust values to create a supportive work environment.
+**2. Understanding Business Requirements**
 
-- **Timeline:**
-  - **Ongoing:** 
-    - **Demonstrate Kindness and Respect:** Show empathy in interactions with colleagues, patients, and partners.
-    - **Promote Teamwork:** Actively collaborate with others and contribute to a positive work environment.
-    - **Align Behaviors with Values:** Ensure personal behaviors align with SomersetFT's shared values and foster a learning-oriented culture.
+- **Collaborate**: Work closely with other teams to understand their data needs.
+- **Analyze**: Review current data workflows and identify areas for improvement.
 
-By following this timeline and meeting these objectives, we can design scalable health data systems that effectively handle increasing data volumes and complexity, ensuring improved patient outcomes, operational efficiency, and regulatory compliance. 
+**3. Understanding and Applying Metadata in NHS Data Cataloging**
 
-#HealthData #DataScalability #CloudHealthcare #DataArchitecture #HealthcareIT #MetadataManagement #InclusiveCulture
+- **Open Source Data Catalog Tools**
+  - **Explore Tools**: Investigate open-source data catalog tools like Open Metadata, Apache Atlas, Amundsen, and DataHub.
+  - **Microsoft Purview**: Learn about Purview’s core features, data discovery capabilities, classification, and data lineage.
+
+**Actions for Metadata Management:**
+  - **Set Up Purview**: Create a Purview account and set up your environment.
+  - **Catalog Data Sources**: Add sample data sources and observe metadata scanning.
+  - **Classify Data**: Experiment with data classification by applying labels and sensitivity levels.
+  - **Explore Lineage**: Trace data lineage within Purview to understand data flow.
+
+**4. Cloud Transition Preparation**
+
+- **Learn**: Enroll in courses or training programs focused on cloud-based data solutions.
+- **Certification**: Obtain relevant certifications, such as AWS AI Fundamentals, AWS Machine Learning, and Azure Solution Architect.
+- **Stay Updated**: Keep abreast of the latest trends and best practices in cloud data management.
+
+**5. Foster a Compassionate and Inclusive Work Culture**
+
+- **Demonstrate Kindness and Respect**: Show compassion and respect in interactions with colleagues, patients, and partners.
+- **Promote Teamwork**: Actively collaborate with others and contribute to a positive work environment.
+- **Align with Values**: Ensure personal behaviors align with SomersetFT's shared values, fostering a learning-oriented culture.
+
+**6. Understanding and Applying Metadata in NHS Data Cataloging**
+
+- **Understanding Metadata Management**
+  - **Objective**: Acquire a comprehensive understanding of metadata and its significance in healthcare.
+  - **Steps**: Learn the basics of metadata, including origin, structure, and context. Acknowledge its role in data governance, interoperability, and data quality.
+
+- **Exploring the European Health Data Space (EHDS)**
+  - **Objective**: Understand EHDS and its influence on healthcare systems.
+  - **Steps**: Study EHDS documentation and comprehend its objectives and use cases.
+
+- **Learning about Health Data Standards**
+  - **Objective**: Understand the connection between health data standards and metadata.
+  - **Steps**: Explore FHIR and HL7 standards and link metadata concepts to these standards.
+
+- **Studying Use Cases**
+  - **Objective**: Examine real-world instances where metadata is vital.
+  - **Steps**: Investigate use cases such as patient records, clinical trials, health research, and data integration.
+
+- **Hands-On Practice**
+  - **Objective**: Gain practical experience in metadata management.
+  - **Steps**: Set up a local environment or utilize cloud services, experiment with metadata repositories, and manage metadata for health-related datasets.
+
+- **Staying Updated**
+  - **Objective**: Stay informed about the latest developments in health data management and metadata.
+  - **Steps**: Follow relevant blogs, forums, and conferences. Engage with the community and learn from experts.
+
+---
+
 
 ============================================================================================================
 ### 16th July 2024 A (How to build an MPI(Master Patient Index ) from Selecting Tables with common columns )
